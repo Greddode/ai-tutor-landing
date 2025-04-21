@@ -21,7 +21,8 @@ const priceIdToTier: Record<string, string> = {
 export async function POST(req: Request) {
   try {
     const body = await req.text()
-    const signature = headers().get("stripe-signature")
+    const headersList = await headers()
+    const signature = headersList.get("stripe-signature")
 
     if (!signature) {
       return new NextResponse("No signature provided", { status: 400 })
