@@ -18,6 +18,9 @@ const nextConfig = {
   experimental: {
     serverActions: true,
   },
+  api: {
+    bodyParser: false,
+  },
 }
 
 export default nextConfig

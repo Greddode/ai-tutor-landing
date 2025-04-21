@@ -38,6 +38,12 @@ async function testWebhook() {
     .update(`${timestamp}.${payload}`)
     .digest('hex');
 
+  console.log('Sending webhook test with:');
+  console.log('Endpoint:', endpoint);
+  console.log('Timestamp:', timestamp);
+  console.log('Signature:', signature);
+  console.log('Payload:', payload);
+
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -48,10 +54,17 @@ async function testWebhook() {
       body: payload
     });
 
-    console.log('Response status:', response.status);
-    console.log('Response body:', await response.text());
+    console.log('\nResponse:');
+    console.log('Status:', response.status);
+    console.log('Status Text:', response.statusText);
+    console.log('Headers:', JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2));
+    console.log('Body:', await response.text());
   } catch (error) {
     console.error('Error testing webhook:', error);
+    if (error instanceof Error) {
+      console.error('Error details:', error.message);
+      console.error('Stack trace:', error.stack);
+    }
   }
 }
 
