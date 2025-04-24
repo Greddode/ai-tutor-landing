@@ -3,11 +3,13 @@ import { NextResponse } from "next/server"
 import Stripe from "stripe"
 import prisma from "@/lib/prisma"
 
-export const runtime = 'edge'
+// Remove Edge runtime
+// export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-03-31.basil",
+  typescript: true,
 })
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
@@ -24,14 +26,23 @@ export async function POST(req: Request) {
     const headersList = await headers()
     const signature = headersList.get("stripe-signature")
 
-    if (!signature) {
-      return new NextResponse("No signature provided", { status: 400 })
-    }
-
     let event: Stripe.Event
 
     try {
-      event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
+      // In development, skip signature verification if no signature is provided
+      if (!signature && process.env.NODE_ENV === "development") {
+        event = JSON.parse(body) as Stripe.Event
+      } else {
+        if (!signature) {
+          return new NextResponse("No signature provided", { status: 400 })
+        }
+        event = await stripe.webhooks.constructEventAsync(
+          body,
+          signature,
+          webhookSecret,
+          300 // 5 minutes tolerance
+        )
+      }
     } catch (err) {
       console.error(`Webhook signature verification failed:`, err)
       return new NextResponse("Webhook signature verification failed", { status: 400 })
