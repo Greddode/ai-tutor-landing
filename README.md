@@ -48,7 +48,7 @@ The project is organized into several key directories:
 
 1. Clone the repository:
    ```bash
-   git clone [[repository-url]](https://github.com/Greddode/ai-tutor-landing.git)
+   git clone https://github.com/Greddode/ai-tutor-landing.git
    cd ai-tutor-landing
    ```
 
